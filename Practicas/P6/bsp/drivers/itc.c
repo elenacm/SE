@@ -49,6 +49,23 @@ static itc_handler_t itc_handlers[itc_src_max];
 inline void itc_init ()
 {
 	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+	uint32_t i;
+
+	for(i = 0; i < itc_src_max; i++){	//Inicializamos el vector itc_handlers
+		itc_handlers[i] = (uint32_t) NULL;
+	}
+
+	// No provocar ninguna interrupción simulada al arrancar
+	itc_regs->intfrc = (uint32_t) 0;
+
+	// Deshabilitar todas las fuentes de interrupción al activar el controlador
+	itc_regs->intenable = (uint32_t) 0;
+	
+	// Activar arbitraje de interrupciones IRQ
+	itc_regs->intcntl = ~(uint32_t)(1 << 19);
+	
+	// Activar arbitraje de interrupciones FIQ
+	itc_regs->intcntl = ~(uint32_t)(1 << 20);
 }
 
 /*****************************************************************************/
@@ -138,6 +155,7 @@ inline void itc_disable_interrupt (itc_src_t src)
 inline void itc_force_interrupt (itc_src_t src)
 {
 	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+	itc_regs->intfrc |= (uint32_t)(1 << src);	//Ponemos el bit deseado a 1
 }
 
 /*****************************************************************************/
@@ -149,6 +167,7 @@ inline void itc_force_interrupt (itc_src_t src)
 inline void itc_unforce_interrupt (itc_src_t src)
 {
 	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
+	itc_regs->intfrc &= ~(uint32_t)(1 << src);	//Ponemos el bit deseado a 0 para desactivarlo
 }
 
 /*****************************************************************************/
@@ -162,7 +181,7 @@ inline void itc_unforce_interrupt (itc_src_t src)
 void itc_service_normal_interrupt ()
 {
 	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
-
+	itc_handlers[itc_regs->NIVECTOR];
 }
 
 /*****************************************************************************/
@@ -173,7 +192,7 @@ void itc_service_normal_interrupt ()
 void itc_service_fast_interrupt ()
 {
 	/* ESTA FUNCIÓN SE DEFINIRÁ EN LA PRÁCTICA 6 */
-	
+	itc_handlers[itc_regs->FIVECTOR];
 }
 
 /*****************************************************************************/
